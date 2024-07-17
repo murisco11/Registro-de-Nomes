@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Nomes</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body>
+
+    <h2>Adicionar Nome</h2>
+    <form id="nomeForm">
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="number" id="idade" placeholder="Idade" required>
+        <input type="text" id="estado" placeholder="Estado" required>
+        <button type="submit">Adicionar Nome</button>
+    </form>
+
+    <h2>Atualizar Nome</h2>
+    <form id="updateForm">
+        <input type="hidden" id="updateNome" required>
+        <input type="text" id="updateIdade" placeholder="Nova Idade" required>
+        <input type="text" id="updateEstado" placeholder="Novo Estado" required>
+        <button type="submit">Atualizar Nome</button>
+    </form>
+
+    <input type="text" id="inputSearch" placeholder="Digite para buscar...">
+    <h2>Lista Geral</h2>
+    <ul id="nomesList">
+    </ul>
+
+    <h2>Lista RN</h2>
+    <ul id="nomesListNatal">
+    </ul>
+
+    <h2>Lista Ceará</h2>
+    <ul id="nomesListFortaleza">
+    </ul>
+
+    <script src="script/script.js"></script>
+
+</body>
+
+</html>
