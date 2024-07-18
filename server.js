@@ -73,16 +73,23 @@ conexao_mongodb()
 
 app.get('/nomes', async (req, res) => {
     try {
-        const database = client.db('pasta_equipamentos')
-        const pasta_nome = database.collection(pasta_trabalho_arquivos)
-        const nomes = await pasta_nome.find({}).toArray()
-        res.status(200).json(nomes)
+        const localSelecionado = req.query.local;
+        const database = client.db('pasta_equipamentos');
+        const pastaNome = database.collection(pasta_trabalho_arquivos);
+
+        let query = {};
+        if (localSelecionado !== 'BRASIL') {
+            query.estado = localSelecionado;
+        }
+
+        const nomes = await pastaNome.find(query).toArray();
+        res.status(200).json(nomes);
+    } catch (e) {
+        console.log(`Erro no GET ${e}`);
+        res.status(500).json({ message: "Erro ao buscar nomes" });
     }
-    catch (e) {
-        console.log(`Erro no GET ${e}`)
-        res.status(500).json({ message: "Erro ao buscar nomes" })
-    }
-})
+});
+
 
 app.post('/adicionando_nomes', async (req, res) => {
     try {
@@ -91,7 +98,7 @@ app.post('/adicionando_nomes', async (req, res) => {
         const { nome, idade, estado, usuario_modificou } = req.body
         const nome_repetido = await pastaNomes.findOne({ nome })
         if (nome_repetido) {
-            return res.status(400).json({ message: 'Nome já existente. Nome não adicionado.' })
+            return res.status(400).json({ message: `Nome já existente. Nome não adicionado.` })
         }
         await pastaNomes.insertOne({ nome, idade, estado, usuario_modificou })
         res.status(200).json({ message: 'Nome adicionado na DB' })
@@ -99,24 +106,6 @@ app.post('/adicionando_nomes', async (req, res) => {
     catch (e) {
         console.log(e)
         res.status(500).json({ message: 'Erro ao adicionar nome' })
-    }
-})
-
-app.post('/adicionando_eventos', async (req, res) => {
-    try {
-        const database = client.db('pasta_equipamentos')
-        const pastaLocais = database.collection(pasta_trabalho_locais)
-        const { local } = req.body
-        const local_repetido = await pastaLocais.findOne({ local })
-        if (local_repetido) {
-            return res.status(400).json({ message: 'Local já existente. Evento não adicionado.' })
-        }
-        await pastaLocais.insertOne({ local })
-        res.status(200).json({ message: 'Local adicionado na DB' })
-    }
-    catch (e) {
-        console.log(e)
-        res.status(500).json({ message: 'Erro ao adicionar local' })
     }
 })
 
@@ -151,6 +140,36 @@ app.put('/atualizando_nomes/:nome', async (req, res) => {
     } catch (e) {
         console.log(e)
         res.status(500).json({ message: 'Erro ao atualizar nome' })
+    }
+})
+
+app.post('/adicionando_locais', async (req, res) => {
+    try {
+        const database = client.db('pasta_equipamentos')
+        const pasta_locais = database.collection(pasta_trabalho_locais)
+        const { local } = req.body
+        const local_repetido = await pasta_locais.findOne({ local })
+        if (local_repetido) {
+            return res.status(400).json({ message: 'Local já existente. Local não adicionado.' })
+        }
+        await pasta_locais.insertOne({ local })
+        res.status(200).json({ message: 'Local adicionado na DB' })
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ message: 'Erro ao adicionar local' })
+    }
+})
+
+app.get('/locais', async (req, res) => {
+    try {
+        const database = client.db('pasta_equipamentos')
+        const pasta_locais = database.collection(pasta_trabalho_locais)
+        const locais = await pasta_locais.find({}).toArray()
+        res.status(200).json(locais)
+    }
+    catch (error) {
+        res.status(500).json({ message: `Erro ao achar os locais` })
     }
 })
 
