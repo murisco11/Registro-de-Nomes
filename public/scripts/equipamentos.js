@@ -3,7 +3,7 @@ console.log(username)
 const localSelecionado = localStorage.getItem('localSelecionado')
 const h1Local = document.getElementById('localH1')
 h1Local.innerHTML = localSelecionado
-const localInput = document.getElementById('estado')
+const localInput = document.getElementById('local')
 localInput.value = localSelecionado
 const btnSairBarras = document.querySelector('#btnSairBarras')
 btnSairBarras.addEventListener('click', () => {
@@ -35,22 +35,22 @@ document.addEventListener('keydown', async (event) => {
         const divBarras = document.getElementById('divBarras')
         divBarras.style.display = 'none'
 
-        const response = await fetch(`/nomes?local=${encodeURIComponent(localSelecionado)}`)
-        const nomes = await response.json()
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`)
+        const equipamentos = await response.json()
 
-        const nome = nomes.find(nome => nome.nome === resultado)
-        if (nome) {
+        const equipamento = equipamentos.find(equipamento => equipamento.tombamento === resultado)
+        if (equipamento) {
             console.log(`Achei o ${resultado} e está sendo direcionado para a edição`)
-            const checkbox = document.querySelector(`input[data-nome="${nome.nome}"]`)
+            const checkbox = document.querySelector(`input[data-equipamento="${equipamento.tombamento}"]`)
             if (checkbox) {
                 checkbox.checked = true
-                selecionados.add(nome.nome)
-                atualizarListaSelecionados()
+                selecionados.add(equipamento.tombamento)
+                atualizar_lista_selecionados()
             }
         } else {
-            const nomeInput = document.getElementById('nome')
-            nomeInput.value = resultado
-            console.log(`Não achei o ${resultado} e está sendo direcionado para adicionar um nome`)
+            const equipamentoInput = document.getElementById('tombamento')
+            equipamentoInput.value = resultado
+            console.log(`Não achei o ${resultado} e está sendo direcionado para adicionar um equipamento`)
             divBarras.style.display = 'none'
         }
     } else {
@@ -61,141 +61,141 @@ document.addEventListener('keydown', async (event) => {
 document.getElementById('nomeForm').addEventListener('submit', async (event) => {
     try {
         event.preventDefault()
-        const nome = document.getElementById('nome').value
-        const idade = document.getElementById('idade').value
-        const estado = document.getElementById('estado').value
+        const tombamento = document.getElementById('tombamento').value
+        const nome_equipamento = document.getElementById('nome_equipamento').value
+        const local = document.getElementById('local').value
         const usuario_modificou = username
-        const response = await fetch('/adicionando_nomes', {
+        const response = await fetch('/adicionando_equipamentos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ nome, idade, estado, usuario_modificou }),
+            body: JSON.stringify({ tombamento, nome_equipamento, local, usuario_modificou }),
         })
 
         const result = await response.json()
         alert(result.message)
-        atualizarListaNomes()
+        atualizar_lista_equipamentos()
     } catch (e) {
         console.log(e)
-        alert('Erro ao adicionar nome')
+        alert('Erro ao adicionar equipamento')
     }
 })
 
-async function atualizarListaNomes() {
+async function atualizar_lista_equipamentos() {
     try {
-        const response = await fetch(`/nomes?local=${encodeURIComponent(localSelecionado)}`)
-        const nomes = await response.json()
-        const nomesList = document.getElementById('nomesList')
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`)
+        const equipamentos = await response.json()
+        const equipamentosList = document.getElementById('equipamentosList')
         const inputSearch = document.getElementById('inputSearch')
         const listaSelecionados = document.getElementById('listaSelecionados')
 
-        nomesList.innerHTML = ''
+        equipamentosList.innerHTML = ''
         listaSelecionados.innerHTML = ''
 
-        nomes.forEach(nome => {
+        equipamentos.forEach(equipamento => {
             const li = document.createElement('li')
-            li.textContent = `${nome.nome} (${nome.idade} anos) - ${nome.estado}`
+            li.textContent = `${equipamento.nome_equipamento} (${equipamento.tombamento}) - ${equipamento.local}`
 
             const btnExcluir = document.createElement('button')
             btnExcluir.textContent = 'Excluir'
-            btnExcluir.addEventListener('click', () => deletarNomes(nome.nome))
+            btnExcluir.addEventListener('click', () => deletar_equipamentos(equipamento.tombamento))
             li.appendChild(btnExcluir)
 
             const checkbox = document.createElement('input')
             checkbox.type = 'checkbox'
-            checkbox.setAttribute('data-nome', nome.nome)
+            checkbox.setAttribute('data-nome', equipamento.tombamento)
             checkbox.addEventListener('change', () => {
                 if (checkbox.checked) {
-                    selecionados.add(nome.nome)
+                    selecionados.add(equipamento.tombamento)
                 } else {
-                    selecionados.delete(nome.nome)
+                    selecionados.delete(equipamento.tombamento)
                 }
-                atualizarListaSelecionados()
+                atualizar_lista_selecionados()
             })
             li.appendChild(checkbox)
-            nomesList.appendChild(li)
+            equipamentosList.appendChild(li)
         })
 
         inputSearch.addEventListener('input', () => {
             const searchTerm = inputSearch.value.toLowerCase()
-            nomesList.innerHTML = ''
+            equipamentosList.innerHTML = ''
 
-            nomes.forEach(nome => {
-                const nomeLowerCase = nome.nome.toLowerCase()
-                if (nomeLowerCase.includes(searchTerm)) {
+            equipamentos.forEach(equipmanto => {
+                const equipamentoLowerCase = equipmanto.tombamento.toLowerCase()
+                if (equipamentoLowerCase.includes(searchTerm)) {
                     const li = document.createElement('li')
-                    li.textContent = `${nome.nome} (${nome.idade} anos) - ${nome.estado}`
+                    li.textContent = `${equipmanto.nome_equipamento} (${equipmanto.tombamento}) - ${equipmanto.local}`
 
                     const btnExcluir = document.createElement('button')
                     btnExcluir.textContent = 'Excluir'
-                    btnExcluir.addEventListener('click', () => deletarNomes(nome.nome))
+                    btnExcluir.addEventListener('click', () => deletar_equipamentos(equipmanto.tombamento))
                     li.appendChild(btnExcluir)
                     
                     const checkbox = document.createElement('input')
                     checkbox.type = 'checkbox'
                     checkbox.addEventListener('change', () => {
                         if (checkbox.checked) {
-                            selecionados.add(nome.nome)
+                            selecionados.add(equipmanto.tombamento)
                         } else {
-                            selecionados.delete(nome.nome)
+                            selecionados.delete(equipmanto.tombamento)
                         }
-                        atualizarListaSelecionados()
+                        atualizar_lista_selecionados()
                     })
                     li.appendChild(checkbox)
 
-                    nomesList.appendChild(li)
+                    equipamentosList.appendChild(li)
                 }
             })
         })
     } catch (e) {
         console.log(e)
-        alert('Erro ao atualizar lista de nomes')
+        alert('Erro ao atualizar lista de equipamentos')
     }
 }
 
-function atualizarListaSelecionados() {
+function atualizar_lista_selecionados() {
     const listaSelecionados = document.getElementById('listaSelecionados')
     listaSelecionados.innerHTML = ''
-    selecionados.forEach(nome => {
+    selecionados.forEach(equipamento => {
         const li = document.createElement('li')
-        li.textContent = nome
+        li.textContent = equipamento
         listaSelecionados.appendChild(li)
     })
 }
 
-async function deletarNomes(nome) {
+async function deletar_equipamentos(equipamento) {
     try {
-        const response = await fetch(`/deletando_nomes/${nome}`, {
+        const response = await fetch(`/deletando_equipamentos/${equipamento}`, {
             method: 'DELETE',
         })
         const result = await response.json()
         console.log('Resposta do servidor:', result)
-        atualizarListaNomes()
-        alert(`${nome} excluído com sucesso!`)
+        atualizar_lista_equipamentos()
+        alert(`${equipamento} excluído com sucesso!`)
     } catch (e) {
         console.log(e)
-        alert('Erro ao excluir nome')
+        alert('Erro ao excluir equipamento')
     }
 }
 
 document.getElementById('updateForm').addEventListener('submit', async (event) => {
     try {
         if (selecionados.size === 0) {
-            return alert('Não possui nenhum nome selecionado!')
+            return alert('Não possui nenhum equipamento selecionado!')
         }
         event.preventDefault();
-        const idade = document.getElementById('updateIdade').value;
+        const nome_equipamento = document.getElementById('updateNomeEquipamento').value;
         const local = document.getElementById('selectLocal').value;
         const usuario_modificou = username;
 
-        const promises = Array.from(selecionados).map(nome => {
-            return fetch(`/atualizando_nomes/${nome}`, {
+        const promises = Array.from(selecionados).map(equipamento => {
+            return fetch(`/atualizando_equipamentos/${equipamento}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ idade, local, usuario_modificou }),
+                body: JSON.stringify({ nome_equipamento, local, usuario_modificou }),
             });
         });
 
@@ -206,10 +206,10 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
         });
         alert('Nomes atualizados com sucesso!');
         selecionados.clear()
-        atualizarListaNomes();
+        atualizar_lista_equipamentos();
     } catch (e) {
         console.log(e);
-        alert('Erro ao atualizar nome');
+        alert('Erro ao atualizar equipamento');
     }
 });
 
@@ -232,4 +232,4 @@ async function preencherSelectLocais() {
 }
 
 preencherSelectLocais();
-atualizarListaNomes();
+atualizar_lista_equipamentos();

@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb')
 const porta = 3002
 const uri = 'mongodb://localhost:27017'
-const pasta_trabalho_arquivos = 'arquivos'
+const pasta_trabalho_equipamentos = 'equipamentos'
 const pasta_trabalho_locais = 'locais'
 const pasta_trabalho_usuarios = 'usuarios'
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -71,75 +71,78 @@ async function conexao_mongodb() {
 
 conexao_mongodb()
 
-app.get('/nomes', async (req, res) => {
+app.get('/equipamentos', async (req, res) => {
     try {
         const localSelecionado = req.query.local;
         const database = client.db('pasta_equipamentos');
-        const pastaNome = database.collection(pasta_trabalho_arquivos);
+        const pasta_equipamento = database.collection(pasta_trabalho_equipamentos);
 
         let query = {};
         if (localSelecionado !== 'BRASIL') {
-            query.estado = localSelecionado;
+            query.local = localSelecionado;
         }
 
-        const nomes = await pastaNome.find(query).toArray();
-        res.status(200).json(nomes);
+        const equipamentos = await pasta_equipamento.find(query).toArray();
+        res.status(200).json(equipamentos);
     } catch (e) {
         console.log(`Erro no GET ${e}`);
-        res.status(500).json({ message: "Erro ao buscar nomes" });
+        res.status(500).json({ message: "Erro ao buscar equipamentos" });
     }
 });
 
 
-app.post('/adicionando_nomes', async (req, res) => {
+app.post('/adicionando_equipamentos', async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
-        const pastaNomes = database.collection(pasta_trabalho_arquivos)
-        const { nome, idade, estado, usuario_modificou } = req.body
-        const nome_repetido = await pastaNomes.findOne({ nome })
-        if (nome_repetido) {
-            return res.status(400).json({ message: `Nome já existente. Nome não adicionado.` })
+        const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
+        const { tombamento, nome_equipamento, local, usuario_modificou } = req.body
+        const equipamento_repetido = await pasta_equipamentos.findOne({ tombamento })
+        if (equipamento_repetido) {
+            return res.status(400).json({ message: `Equipamento já existente. Equipamento não adicionado.` })
         }
-        await pastaNomes.insertOne({ nome, idade, estado, usuario_modificou })
-        res.status(200).json({ message: 'Nome adicionado na DB' })
+        await pasta_equipamentos.insertOne({ tombamento, nome_equipamento, local, usuario_modificou })
+        res.status(200).json({ message: 'Equipamento adicionado na DB' })
     }
     catch (e) {
         console.log(e)
-        res.status(500).json({ message: 'Erro ao adicionar nome' })
+        res.status(500).json({ message: 'Erro ao adicionar equipamento' })
     }
 })
 
-app.delete('/deletando_nomes/:nome', async (req, res) => {
+app.delete('/deletando_equipamentos/:equipamento', async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
-        const pastaNomes = database.collection(pasta_trabalho_arquivos)
-        const nome = req.params.nome
-        const deletado = await pastaNomes.deleteOne({ nome })
-        res.status(200).json({ message: `${nome} foi deletado!` })
+        const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
+        const tombamento = req.params.equipamento
+        const deletado = await pasta_equipamentos.deleteOne({ tombamento })
+        if (deletado.deletedCount === 0) {
+            return res.status(404).json({ message: 'Equipamento não encontrado' });
+        }
+        res.status(200).json({ message: `${tombamento} foi deletado!` })
     }
     catch (e) {
         console.log(e)
-        res.status(500).json({ message: `Erro ao excluir nome` })
+        res.status(500).json({ message: `Erro ao excluir equipamento` })
     }
 })
 
-app.put('/atualizando_nomes/:nome', async (req, res) => {
+app.put('/atualizando_equipamentos/:equipamento', async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
-        const pastaNomes = database.collection(pasta_trabalho_arquivos)
-        const nome = req.params.nome
-        const { idade, local, usuario_modificou } = req.body
+        const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
+        const tombamento = req.params.equipamento
+        const { nome_equipamento, local, usuario_modificou } = req.body
 
-        const result = await pastaNomes.updateOne({ nome }, { $set: { idade, local, usuario_modificou } })
+        const result = await pasta_equipamentos.updateOne({ tombamento }, { $set: { nome_equipamento, local, usuario_modificou } })
 
         if (result.matchedCount === 0) {
-            return res.status(404).json({ message: 'Nome não encontrado' })
+            return res.status(404).json({ message: 'Equipamento não encontrado' })
         }
 
-        res.status(200).json({ message: `${nome} atualizado com sucesso!` })
+        res.status(200).json({ message: `${tombamento} atualizado com sucesso!` })
     } catch (e) {
         console.log(e)
-        res.status(500).json({ message: 'Erro ao atualizar nome' })
+        res.status(500).json({ message: 'Erro ao atualizar equipamento' })
     }
 })
 
