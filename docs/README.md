@@ -1,11 +1,15 @@
+## O que è?
+
+Desenvolvi esse sistema para a empresa do qual trabalho para gerenciar os equipamentos: saber onde eles estão, editá-los e etc; além da formaçao de locais
+
 ## Tecnologias usadas:
 
-    HTML, CSS
-    JavaScript
-    Node.Js
-    Express
-    MongoDB
-    JWT e BCrypt
+HTML, CSS
+JavaScript
+Node.Js
+Framework: Express
+Database: MongoDB
+Libraries: JWT e BCrypt
 
 ## Como usar?
 
