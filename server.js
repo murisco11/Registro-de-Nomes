@@ -128,9 +128,9 @@ app.put('/atualizando_nomes/:nome', async (req, res) => {
         const database = client.db('pasta_equipamentos')
         const pastaNomes = database.collection(pasta_trabalho_arquivos)
         const nome = req.params.nome
-        const { idade, estado, usuario_modificou } = req.body
+        const { idade, local, usuario_modificou } = req.body
 
-        const result = await pastaNomes.updateOne({ nome }, { $set: { idade, estado, usuario_modificou } })
+        const result = await pastaNomes.updateOne({ nome }, { $set: { idade, local, usuario_modificou } })
 
         if (result.matchedCount === 0) {
             return res.status(404).json({ message: 'Nome não encontrado' })

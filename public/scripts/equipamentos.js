@@ -102,15 +102,6 @@ async function atualizarListaNomes() {
             btnExcluir.addEventListener('click', () => deletarNomes(nome.nome))
             li.appendChild(btnExcluir)
 
-            const btnAtualizar = document.createElement('button')
-            btnAtualizar.textContent = 'Atualizar'
-            btnAtualizar.addEventListener('click', () => {
-                document.getElementById('updateNome').value = nome.nome
-                document.getElementById('updateIdade').value = nome.idade
-                document.getElementById('updateEstado').value = nome.estado
-            })
-            li.appendChild(btnAtualizar)
-
             const checkbox = document.createElement('input')
             checkbox.type = 'checkbox'
             checkbox.setAttribute('data-nome', nome.nome)
@@ -140,16 +131,7 @@ async function atualizarListaNomes() {
                     btnExcluir.textContent = 'Excluir'
                     btnExcluir.addEventListener('click', () => deletarNomes(nome.nome))
                     li.appendChild(btnExcluir)
-
-                    const btnAtualizar = document.createElement('button')
-                    btnAtualizar.textContent = 'Atualizar'
-                    btnAtualizar.addEventListener('click', () => {
-                        document.getElementById('updateNome').value = nome.nome
-                        document.getElementById('updateIdade').value = nome.idade
-                        document.getElementById('updateEstado').value = nome.estado
-                    })
-                    li.appendChild(btnAtualizar)
-
+                    
                     const checkbox = document.createElement('input')
                     checkbox.type = 'checkbox'
                     checkbox.addEventListener('change', () => {
@@ -199,6 +181,9 @@ async function deletarNomes(nome) {
 
 document.getElementById('updateForm').addEventListener('submit', async (event) => {
     try {
+        if (selecionados.size === 0) {
+            return alert('Não possui nenhum nome selecionado!')
+        }
         event.preventDefault();
         const idade = document.getElementById('updateIdade').value;
         const local = document.getElementById('selectLocal').value;
@@ -220,6 +205,7 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
             console.log(result.message);
         });
         alert('Nomes atualizados com sucesso!');
+        selecionados.clear()
         atualizarListaNomes();
     } catch (e) {
         console.log(e);
