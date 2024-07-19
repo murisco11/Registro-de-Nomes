@@ -1,4 +1,14 @@
+## Tecnologias usadas:
+
+    HTML, CSS
+    JavaScript
+    Node.Js
+    Express
+    MongoDB
+    JWT e BCrypt
+
 ## Como usar?
+
 Primeiro, baixe o repositóroio na sua máquina, e no PowerShell, utilize o comando "npm init -y", para instalar todas as dependências
 Após, digite "npm install mongodb express bcrypt jsonwebtoken"
 Depois, conecte o servidor MongoDB e modifuqe o URI se necessário
