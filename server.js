@@ -12,7 +12,7 @@ const app = express()
 app.use(express.json())
 app.use(express.static('./public/'))
 
-const secretKey = 'chave'
+const chave = 'datashow-chave-secreta'
 
 app.post('/register', async (req, res) => {
     try {
@@ -27,6 +27,7 @@ app.post('/register', async (req, res) => {
 
         const user_senha_criptografada = await bcrypt.hash(password, 10)
         await pasta_usuarios.insertOne({ username, password: user_senha_criptografada })
+
         res.status(201).json({ message: 'Usuário registrado com sucesso' })
     } catch (e) {
         console.log(e)
@@ -41,23 +42,19 @@ app.post('/login', async (req, res) => {
         const { username, password } = req.body
 
         const user_usuario = await pasta_usuarios.findOne({ username })
-        if (!user_usuario) {
-            return res.status(400).json({ message: 'Usuário ou senha inválida' })
-        }
-
         const user_senha = await bcrypt.compare(password, user_usuario.password)
-        if (!user_senha) {
+        if (!user_senha || !user_usuario) {
             return res.status(400).json({ message: 'Usuário ou senha inválida' })
         }
 
-        const token = jwt.sign({ username: user_usuario.username }, secretKey, { expiresIn: '1m' })
+        const token = jwt.sign({ username: user_usuario.username }, chave, { expiresIn: '1m' })
+
         res.json({ token, username: user_usuario.username })
     } catch (e) {
         console.log(e)
-        res.status(500).json({ message: 'Erro em logar' })
+        res.status(500).json({ message: 'Erro em fazer o login' })
     }
 })
-
 
 async function conexao_mongodb() {
     try {
@@ -73,22 +70,22 @@ conexao_mongodb()
 
 app.get('/equipamentos', async (req, res) => {
     try {
-        const localSelecionado = req.query.local;
-        const database = client.db('pasta_equipamentos');
-        const pasta_equipamento = database.collection(pasta_trabalho_equipamentos);
+        const localSelecionado = req.query.local
+        const database = client.db('pasta_equipamentos')
+        const pasta_equipamento = database.collection(pasta_trabalho_equipamentos)
 
-        let query = {};
+        let query = {}
         if (localSelecionado !== 'BRASIL') {
-            query.local = localSelecionado;
+            query.local = localSelecionado
         }
 
-        const equipamentos = await pasta_equipamento.find(query).toArray();
-        res.status(200).json(equipamentos);
+        const equipamentos = await pasta_equipamento.find(query).toArray()
+        res.status(200).json(equipamentos)
     } catch (e) {
-        console.log(`Erro no GET ${e}`);
-        res.status(500).json({ message: "Erro ao buscar equipamentos" });
+        console.log(`Erro no GET ${e}`)
+        res.status(500).json({ message: "Erro ao buscar equipamentos" })
     }
-});
+})
 
 
 app.post('/adicionando_equipamentos', async (req, res) => {
@@ -96,11 +93,14 @@ app.post('/adicionando_equipamentos', async (req, res) => {
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
         const { tombamento, nome_equipamento, local, usuario_modificou } = req.body
+
         const equipamento_repetido = await pasta_equipamentos.findOne({ tombamento })
         if (equipamento_repetido) {
             return res.status(400).json({ message: `Equipamento já existente. Equipamento não adicionado.` })
         }
+
         await pasta_equipamentos.insertOne({ tombamento, nome_equipamento, local, usuario_modificou })
+
         res.status(200).json({ message: 'Equipamento adicionado na DB' })
     }
     catch (e) {
@@ -114,10 +114,12 @@ app.delete('/deletando_equipamentos/:equipamento', async (req, res) => {
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
         const tombamento = req.params.equipamento
+
         const deletado = await pasta_equipamentos.deleteOne({ tombamento })
         if (deletado.deletedCount === 0) {
-            return res.status(404).json({ message: 'Equipamento não encontrado' });
+            return res.status(404).json({ message: 'Equipamento não encontrado' })
         }
+
         res.status(200).json({ message: `${tombamento} foi deletado!` })
     }
     catch (e) {
@@ -151,11 +153,14 @@ app.post('/adicionando_locais', async (req, res) => {
         const database = client.db('pasta_equipamentos')
         const pasta_locais = database.collection(pasta_trabalho_locais)
         const { local } = req.body
+
         const local_repetido = await pasta_locais.findOne({ local })
         if (local_repetido) {
             return res.status(400).json({ message: 'Local já existente. Local não adicionado.' })
         }
+
         await pasta_locais.insertOne({ local })
+
         res.status(200).json({ message: 'Local adicionado na DB' })
     }
     catch (e) {
@@ -169,6 +174,7 @@ app.get('/locais', async (req, res) => {
         const database = client.db('pasta_equipamentos')
         const pasta_locais = database.collection(pasta_trabalho_locais)
         const locais = await pasta_locais.find({}).toArray()
+
         res.status(200).json(locais)
     }
     catch (error) {
