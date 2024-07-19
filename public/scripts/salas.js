@@ -18,9 +18,15 @@ document.getElementById('formLocal').addEventListener('submit', async (event) =>
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ local })
     })
+    if (response.status === 401 || response.status === 403) {
+      alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+      window.location.href = '../login-register.html'
+      return
+    }
     const result = await response.json()
     alert(result.message)
     colocarEventos()
@@ -34,7 +40,14 @@ async function colocarEventos() {
   const lista = document.getElementById('listaLocais')
   lista.innerHTML = ''
   try {
-    const response = await fetch('/locais')
+    const response = await fetch('/locais', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (response.status === 401 || response.status === 403) {
+      alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+      window.location.href = '../login-register.html'
+      return
+    }
     const locais = await response.json()
     locais.forEach(local => {
       const li = document.createElement('li')

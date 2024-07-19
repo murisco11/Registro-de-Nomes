@@ -1,8 +1,13 @@
 const username = localStorage.getItem('username')
 const localSelecionado = localStorage.getItem('localSelecionado')
+const token = localStorage.getItem('token')
 const h1Local = document.getElementById('localH1')
 const localInput = document.getElementById('local')
 const btnSairBarras = document.querySelector('#btnSairBarras')
+
+if (!token || !username) {
+    window.location.href = '../login-register.html'
+}
 
 btnSairBarras.addEventListener('click', () => {
     const divBarras = document.getElementById('divBarras')
@@ -34,7 +39,14 @@ document.addEventListener('keydown', async (event) => {
         const divBarras = document.getElementById('divBarras')
         divBarras.style.display = 'none'
 
-        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`)
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (response.status === 401 || response.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
         const equipamentos = await response.json()
 
         const equipamento = equipamentos.find(equipamento => equipamento.tombamento === resultado)
@@ -67,9 +79,15 @@ document.getElementById('nomeForm').addEventListener('submit', async (event) => 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ tombamento, nome_equipamento, local, usuario_modificou }),
         })
+        if (response.status === 401 || response.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
 
         const result = await response.json()
         alert(result.message)
@@ -81,7 +99,14 @@ document.getElementById('nomeForm').addEventListener('submit', async (event) => 
 
 async function atualizar_lista_equipamentos() {
     try {
-        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`)
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (response.status === 401 || response.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
         const equipamentos = await response.json()
 
         const equipamentosList = document.getElementById('equipamentosList')
@@ -130,7 +155,7 @@ async function atualizar_lista_equipamentos() {
                     btnExcluir.textContent = 'Excluir'
                     btnExcluir.addEventListener('click', () => deletar_equipamentos(equipmanto.tombamento))
                     li.appendChild(btnExcluir)
-                    
+
                     const checkbox = document.createElement('input')
                     checkbox.type = 'checkbox'
                     checkbox.addEventListener('change', () => {
@@ -155,7 +180,7 @@ async function atualizar_lista_equipamentos() {
 function atualizar_lista_selecionados() {
     const listaSelecionados = document.getElementById('listaSelecionados')
     listaSelecionados.innerHTML = ''
-    
+
     selecionados.forEach(equipamento => {
         const li = document.createElement('li')
         li.textContent = equipamento
@@ -165,9 +190,15 @@ function atualizar_lista_selecionados() {
 
 async function deletar_equipamentos(equipamento) {
     try {
-        await fetch(`/deletando_equipamentos/${equipamento}`, {
+        const response = await fetch(`/deletando_equipamentos/${equipamento}`, {
             method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
         })
+        if (response.status === 401 || response.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
         atualizar_lista_equipamentos()
         alert(`${equipamento} excluído com sucesso!`)
     } catch (e) {
@@ -191,6 +222,7 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ nome_equipamento, local, usuario_modificou }),
             })
@@ -200,6 +232,11 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
         responses.forEach(async response => {
             await response.json()
         })
+        if (responses.status === 401 || responses.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
 
         alert('Nomes atualizados com sucesso!')
         selecionados.clear()
@@ -211,7 +248,14 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
 
 async function preencherSelectLocais() {
     try {
-        const response = await fetch('/locais')
+        const response = await fetch('/locais', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (response.status === 401 || response.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
         const locais = await response.json()
         const select = document.getElementById('selectLocal')
 

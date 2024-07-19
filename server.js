@@ -4,6 +4,7 @@ const uri = 'mongodb://localhost:27017'
 const pasta_trabalho_equipamentos = 'equipamentos'
 const pasta_trabalho_locais = 'locais'
 const pasta_trabalho_usuarios = 'usuarios'
+const autenticacao_token = require('./auth/auth')
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
@@ -68,7 +69,7 @@ async function conexao_mongodb() {
 
 conexao_mongodb()
 
-app.get('/equipamentos', async (req, res) => {
+app.get('/equipamentos', autenticacao_token, async (req, res) => {
     try {
         const localSelecionado = req.query.local
         const database = client.db('pasta_equipamentos')
@@ -88,7 +89,7 @@ app.get('/equipamentos', async (req, res) => {
 })
 
 
-app.post('/adicionando_equipamentos', async (req, res) => {
+app.post('/adicionando_equipamentos', autenticacao_token, async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
@@ -109,7 +110,7 @@ app.post('/adicionando_equipamentos', async (req, res) => {
     }
 })
 
-app.delete('/deletando_equipamentos/:equipamento', async (req, res) => {
+app.delete('/deletando_equipamentos/:equipamento', autenticacao_token, async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
@@ -128,7 +129,7 @@ app.delete('/deletando_equipamentos/:equipamento', async (req, res) => {
     }
 })
 
-app.put('/atualizando_equipamentos/:equipamento', async (req, res) => {
+app.put('/atualizando_equipamentos/:equipamento', autenticacao_token, async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
@@ -148,7 +149,7 @@ app.put('/atualizando_equipamentos/:equipamento', async (req, res) => {
     }
 })
 
-app.post('/adicionando_locais', async (req, res) => {
+app.post('/adicionando_locais', autenticacao_token, async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
         const pasta_locais = database.collection(pasta_trabalho_locais)
@@ -169,7 +170,7 @@ app.post('/adicionando_locais', async (req, res) => {
     }
 })
 
-app.get('/locais', async (req, res) => {
+app.get('/locais', autenticacao_token, async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
         const pasta_locais = database.collection(pasta_trabalho_locais)
