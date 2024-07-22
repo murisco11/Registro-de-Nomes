@@ -48,7 +48,7 @@ app.post('/login', async (req, res) => {
             return res.status(400).json({ message: 'Usuário ou senha inválida' })
         }
 
-        const token = jwt.sign({ username: user_usuario.username }, chave, { expiresIn: '1m' })
+        const token = jwt.sign({ username: user_usuario.username }, chave, { expiresIn: '48h' })
 
         res.json({ token, username: user_usuario.username })
     } catch (e) {
@@ -136,7 +136,14 @@ app.put('/atualizando_equipamentos/:equipamento', autenticacao_token, async (req
         const tombamento = req.params.equipamento
         const { nome_equipamento, local, usuario_modificou } = req.body
 
-        const result = await pasta_equipamentos.updateOne({ tombamento }, { $set: { nome_equipamento, local, usuario_modificou } })
+        
+        let campos_para_atualizar = { local, usuario_modificou }
+
+        if (nome_equipamento !== '') {
+            campos_para_atualizar.nome_equipamento = nome_equipamento
+        }
+
+        const result = await pasta_equipamentos.updateOne({ tombamento }, { $set: campos_para_atualizar })
 
         if (result.matchedCount === 0) {
             return res.status(404).json({ message: 'Equipamento não encontrado' })
