@@ -9,7 +9,7 @@ JavaScript
 Node.Js
 Framework: Express
 Database: MongoDB
-Libraries: JWT e BCrypt
+Libraries: SheetJS, JWT e BCrypt
 
 ## Como usar?
 
