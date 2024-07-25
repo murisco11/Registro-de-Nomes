@@ -5,6 +5,34 @@ if (!token || !username) {
 }
 console.log(token)
 console.log(username)
+document.getElementById('btnEquipamentosDeletados').addEventListener('click', async () => {
+  try {
+    const response = await fetch('/equipamentos_deletados', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    if (response.status === 401 || response.status === 403) {
+      alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+      window.location.href = '../login-register.html'
+      return
+    }
+
+    const equipamentos_deletados = await response.json()
+    const data = equipamentos_deletados.map(equipamento => ({
+      Tombamento: equipamento.tombamento,
+      Equipamento: equipamento.equipamento,
+      "Usuário que deletou": equipamento.usuario,
+      Motivo: equipamento.motivo
+    }))
+
+    const planilha = XLSX.utils.json_to_sheet(data)
+    const pasta_trabalho = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(pasta_trabalho, planilha, 'Relatorio')
+
+    XLSX.writeFile(pasta_trabalho, 'relatorio.xlsx')
+  } catch (error) {
+    console.error('Erro ao gerar relatório:', error)
+  }
+})
 
 document.getElementById('formLocal').addEventListener('submit', async (event) => {
   event.preventDefault()
@@ -29,14 +57,14 @@ document.getElementById('formLocal').addEventListener('submit', async (event) =>
     }
     const result = await response.json()
     alert(result.message)
-    colocarEventos()
+    colocar_eventos()
   }
   catch (error) {
-    console.log(`Ocorreu um erro em adicionar os locais: ${error}`)
+    console.error(`Ocorreu um erro em adicionar os locais: ${error}`)
   }
 })
 
-async function colocarEventos() {
+async function colocar_eventos() {
   const lista = document.getElementById('listaLocais')
   lista.innerHTML = ''
   try {
@@ -64,8 +92,8 @@ async function colocarEventos() {
     })
   }
   catch (error) {
-    console.log(`Ocorreu um erro em pegar os locais: ${error}`)
+    console.error(`Ocorreu um erro em pegar os locais: ${error}`)
   }
 }
 
-colocarEventos()
+colocar_eventos()

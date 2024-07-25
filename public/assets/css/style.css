@@ -1,131 +1,142 @@
+/* assets/css/style.css */
+
+/* Estilo geral do corpo */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #e9ecef;
-    margin: 0;
-    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f8f9fa;
 }
 
-.container {
-    width: 80vw;
-    margin: auto auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-header h1,
-.container h1,
-.container h2 {
-    color: #343a40;
-    margin: 20px 0;
-    font-size: 2em;
-    font-weight: 600;
-}
-
-section {
-    margin-bottom: 20px;
-}
-
-form {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
-}
-
-form:hover {
-    background: #e2e6ea;
-}
-
-input[type="text"],
-input[type="number"],
-input[type="password"] {
-    width: calc(100% - 22px);
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-button {
-    margin: 10px 0;
-    background: linear-gradient(90deg, rgba(255, 0, 0, 1) 0%, rgba(200, 0, 0, 1) 100%);
+/* Estilo do cabeçalho */
+header {
+    background-color: #007bff;
     color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background 0.3s ease, transform 0.2s ease;
+    padding: 20px;
+    text-align: center;
 }
 
-button:hover {
-    background: linear-gradient(90deg, rgba(200, 0, 0, 1) 0%, rgba(150, 0, 0, 1) 100%);
-    transform: scale(1.05);
+header h1 {
+    margin: 0;
 }
 
-ul {
+/* Estilo dos botões */
+.btn {
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* Estilo das seções */
+section {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+section h2 {
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+/* Estilo dos formulários */
+form {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+input.form-control {
+    font-size: 1.2rem;
+    padding: 10px;
+}
+
+/* Estilo das listas */
+ul.list-group {
     list-style-type: none;
     padding: 0;
 }
 
-li {
-    background: #fff;
-    padding: 12px;
-    margin: 8px 0;
+ul.list-group li {
+    background-color: #fff;
     border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-#divBarras {
-    display: none;
-    position: fixed;
-    width: 80vw;
-    height: 80vh;
-    background: rgba(255, 255, 255, 0.727);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    text-align: center;
-    padding-top: 20vh;
-    border-radius: 8px;
-    color: #fff;
-    font-size: 1.5em;
+ul.list-group li:hover {
+    background-color: #f1f1f1;
+    border-color: #007bff;
 }
 
-.form-section {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
+/* Estilo das navegações */
+.navbar {
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
 }
 
-.form-section:hover {
-    background: #f1f3f5;
+.navbar-nav .nav-item .nav-link {
+    font-size: 1.2rem;
 }
 
-#registerSection {
-    display: none;
+.navbar-brand {
+    font-size: 1.5rem;
 }
 
-#switchToRegister,
-#switchToLogin {
-    color: red;
-    text-decoration: none;
-    font-weight: bold;
+/* Estilo do input de busca */
+#inputSearch {
+    font-size: 1.2rem;
+    padding: 10px;
 }
 
-#switchToRegister:hover,
-#switchToLogin:hover {
-    text-decoration: underline;
+/* Estilo do container */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
 }

@@ -4,15 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Nomes</title>
+    <title>Gerenciamento de Equipamentos</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <header>
-            <h1 id="localH1"></h1>
-        </header>
+
+        <nav>
+            <ul>
+                <div id="empresa">DataShow Brasil</div>
+                <li><a href="#addLocalSection">Local</a></li>
+                <li><a href="#loginSection">Login</a></li>
+                <li><a href="#userSection">Usuário Logado</a></li>
+            </ul>
+        </nav>
+
+        <h1 id="localH1"></h1>
+
+        <button id="btnBaixarRelatorio">Baixar Relatório</button>
 
         <section id="addNomeSection">
             <h2>Adicionar Equipamento</h2>
@@ -34,6 +45,7 @@
             <form id="updateForm">
                 <input type="hidden" id="updateTombamento">
                 <input type="text" id="updateNomeEquipamento" placeholder="Novo Nome do Equipamento">
+                <input type="text" id="updateVezesUsado" placeholder="Novo Numero de Vezes Usado">
                 <select id="selectLocal"></select>
                 <button type="submit">Atualizar Equipamento</button>
             </form>

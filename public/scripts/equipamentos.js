@@ -28,6 +28,39 @@ document.getElementById('leitorBarras').addEventListener('click', () => {
     barcode = ''
 })
 
+document.querySelector('#btnBaixarRelatorio').addEventListener('click', async () => {
+    try {
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (response.status === 401 || response.status === 403) {
+            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
+            window.location.href = '../login-register.html'
+            return
+        }
+
+        const equipamentos = await response.json()
+
+        const data = equipamentos.map(equipamento => ({
+            Tombamento: equipamento.tombamento,
+            Equipamento: equipamento.nome_equipamento,
+            Local: equipamento.local,
+            "Data de Criação": equipamento.data_criacao,
+            "Vezes usado": equipamento.vezes_usado,
+            "Últime vez alterado por": equipamento.usuario_modificou
+        }))
+
+        const planilha = XLSX.utils.json_to_sheet(data)
+        const pasta_trabalho = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(pasta_trabalho, planilha, 'Histórico')
+
+        XLSX.writeFile(pasta_trabalho, 'historico.xlsx')
+    }
+    catch (error) {
+        console.log(error)
+    }
+})
+
 document.addEventListener('keydown', async (event) => {
     if (!reading) return
 
@@ -118,11 +151,18 @@ async function atualizar_lista_equipamentos() {
 
         equipamentos.forEach(equipamento => {
             const li = document.createElement('li')
-            li.textContent = `${equipamento.nome_equipamento} (${equipamento.tombamento}) - ${equipamento.local}`
+            li.textContent = `${equipamento.nome_equipamento} (${equipamento.tombamento}) - ${equipamento.local} -  Data de criação do produto: ${equipamento.data_criacao} - Quantas vezes usado: ${equipamento.vezes_usado}`
 
             const btnExcluir = document.createElement('button')
             btnExcluir.textContent = 'Excluir'
-            btnExcluir.addEventListener('click', () => deletar_equipamentos(equipamento.tombamento))
+            btnExcluir.addEventListener('click', () => {
+                const motivo = prompt(`Insira o motivo do porque deletar o ${equipamento.nome_equipamento} (${equipamento.tombamento})`)
+                if (!motivo) {
+                    alert("Equipamento não deletado!")
+                    return
+                }
+                deletar_equipamentos(equipamento.tombamento, motivo)
+            })
             li.appendChild(btnExcluir)
 
             const checkbox = document.createElement('input')
@@ -145,24 +185,24 @@ async function atualizar_lista_equipamentos() {
             const searchTerm = inputSearch.value.toLowerCase()
             equipamentosList.innerHTML = ''
 
-            equipamentos.forEach(equipmanto => {
-                const equipamentoLowerCase = equipmanto.tombamento.toLowerCase()
+            equipamentos.forEach(equipamento => {
+                const equipamentoLowerCase = equipamento.tombamento.toLowerCase()
                 if (equipamentoLowerCase.includes(searchTerm)) {
                     const li = document.createElement('li')
-                    li.textContent = `${equipmanto.nome_equipamento} (${equipmanto.tombamento}) - ${equipmanto.local}`
+                    li.textContent = `${equipamento.nome_equipamento} (${equipamento.tombamento}) - ${equipamento.local} -  Data de criação do produto: ${equipamento.data_criacao} - Quantas vezes usado: ${equipamento.vezes_usado}`
 
                     const btnExcluir = document.createElement('button')
                     btnExcluir.textContent = 'Excluir'
-                    btnExcluir.addEventListener('click', () => deletar_equipamentos(equipmanto.tombamento))
+                    btnExcluir.addEventListener('click', () => deletar_equipamentos(equipamento.tombamento))
                     li.appendChild(btnExcluir)
 
                     const checkbox = document.createElement('input')
                     checkbox.type = 'checkbox'
                     checkbox.addEventListener('change', () => {
                         if (checkbox.checked) {
-                            selecionados.add(equipmanto.tombamento)
+                            selecionados.add(equipamento.tombamento)
                         } else {
-                            selecionados.delete(equipmanto.tombamento)
+                            selecionados.delete(equipamento.tombamento)
                         }
                         atualizar_lista_selecionados()
                     })
@@ -188,9 +228,9 @@ function atualizar_lista_selecionados() {
     })
 }
 
-async function deletar_equipamentos(equipamento) {
+async function deletar_equipamentos(equipamento, motivo) {
     try {
-        const response = await fetch(`/deletando_equipamentos/${equipamento}`, {
+        const response = await fetch(`/deletando_equipamentos/${equipamento}?motivo=${encodeURIComponent(motivo)}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -215,7 +255,12 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
 
         const nome_equipamento = document.getElementById('updateNomeEquipamento').value
         const local = document.getElementById('selectLocal').value
+        let vezes_usado = document.getElementById('updateVezesUsado').value
         const usuario_modificou = username
+
+        if (!vezes_usado) {
+            vezes_usado = undefined
+        }
 
         const promises = Array.from(selecionados).map(equipamento => {
             return fetch(`/atualizando_equipamentos/${equipamento}`, {
@@ -224,7 +269,7 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ nome_equipamento, local, usuario_modificou }),
+                body: JSON.stringify({ nome_equipamento, local, usuario_modificou, vezes_usado }),
             })
         })
 
@@ -257,9 +302,16 @@ async function preencherSelectLocais() {
             return
         }
         const locais = await response.json()
+
+        const locais_filtrados = locais.filter(local =>
+            local.local !== 'GALPÕES' &&
+            local.local !== 'EVENTOS' &&
+            local.local !== 'BRASIL'
+        )
+
         const select = document.getElementById('selectLocal')
 
-        locais.forEach(local => {
+        locais_filtrados.forEach(local => {
             const option = document.createElement('option')
             option.innerText = local.local
             option.value = local.local

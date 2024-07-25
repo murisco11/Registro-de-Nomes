@@ -4,6 +4,7 @@ const uri = 'mongodb://localhost:27017'
 const pasta_trabalho_equipamentos = 'equipamentos'
 const pasta_trabalho_locais = 'locais'
 const pasta_trabalho_usuarios = 'usuarios'
+const pasta_trabalho_deletados = 'deletados'
 const autenticacao_token = require('./auth/auth')
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true })
 const bcrypt = require('bcrypt')
@@ -14,6 +15,14 @@ app.use(express.json())
 app.use(express.static('./public/'))
 
 const chave = 'datashow-chave-secreta'
+
+const data_atual = new Date()
+const formatar_data = (data) => {
+    const dia = data.getDate().toString().padStart(2, '0')
+    const mes = (data.getMonth() + 1).toString().padStart(2, '0')
+    const ano = data.getFullYear()
+    return `${dia}/${mes}/${ano}`
+}
 
 app.post('/register', async (req, res) => {
     try {
@@ -76,7 +85,18 @@ app.get('/equipamentos', autenticacao_token, async (req, res) => {
         const pasta_equipamento = database.collection(pasta_trabalho_equipamentos)
 
         let query = {}
-        if (localSelecionado !== 'BRASIL') {
+
+        if (localSelecionado === 'BRASIL') {
+            console.log('Local selecionado:', localSelecionado)
+            query = {}
+        } else if (localSelecionado === 'GALPÕES') {
+            console.log('Local selecionado:', localSelecionado)
+            query.local = { $in: ['GALPÃO CAPIM MACIO', 'GALPÃO EMAÚS'] }
+        } else if (localSelecionado === 'EVENTOS') {
+            console.log('Local selecionado:', localSelecionado)
+            query.local = { $nin: ['GALPÃO CAPIM MACIO', 'GALPÃO EMAÚS'] }
+        } else {
+            console.log('Local selecionado:', localSelecionado)
             query.local = localSelecionado
         }
 
@@ -88,19 +108,20 @@ app.get('/equipamentos', autenticacao_token, async (req, res) => {
     }
 })
 
-
 app.post('/adicionando_equipamentos', autenticacao_token, async (req, res) => {
     try {
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
         const { tombamento, nome_equipamento, local, usuario_modificou } = req.body
+        const data_criacao = formatar_data(data_atual)
+        const vezes_usado = 0
 
         const equipamento_repetido = await pasta_equipamentos.findOne({ tombamento })
         if (equipamento_repetido) {
             return res.status(400).json({ message: `Equipamento já existente. Equipamento não adicionado.` })
         }
 
-        await pasta_equipamentos.insertOne({ tombamento, nome_equipamento, local, usuario_modificou })
+        await pasta_equipamentos.insertOne({ tombamento, nome_equipamento, local, usuario_modificou, data_criacao, vezes_usado })
 
         res.status(200).json({ message: 'Equipamento adicionado na DB' })
     }
@@ -115,6 +136,22 @@ app.delete('/deletando_equipamentos/:equipamento', autenticacao_token, async (re
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
         const tombamento = req.params.equipamento
+        const motivo = req.query.motivo
+        const pasta_equipamentos_deletados = database.collection(pasta_trabalho_deletados)
+
+        const equipamento = await pasta_equipamentos.findOne({ tombamento })
+        if (!equipamento) {
+            return res.status(404).json({ message: 'Equipamento não encontrado' });
+        }
+
+        const equipamento_deletado = {
+            tombamento: equipamento.tombamento,
+            equipamento: equipamento.nome_equipamento,
+            usuario: equipamento.usuario_modificou,
+            motivo: motivo
+        }
+
+        await pasta_equipamentos_deletados.insertOne(equipamento_deletado)
 
         const deletado = await pasta_equipamentos.deleteOne({ tombamento })
         if (deletado.deletedCount === 0) {
@@ -134,16 +171,22 @@ app.put('/atualizando_equipamentos/:equipamento', autenticacao_token, async (req
         const database = client.db('pasta_equipamentos')
         const pasta_equipamentos = database.collection(pasta_trabalho_equipamentos)
         const tombamento = req.params.equipamento
-        const { nome_equipamento, local, usuario_modificou } = req.body
-
-        
-        let campos_para_atualizar = { local, usuario_modificou }
+        const { nome_equipamento, local, usuario_modificou, vezes_usado } = req.body
+        const atualizacao = { $set: { local, usuario_modificou } }
 
         if (nome_equipamento !== '') {
-            campos_para_atualizar.nome_equipamento = nome_equipamento
+            atualizacao.$set.nome_equipamento = nome_equipamento
         }
 
-        const result = await pasta_equipamentos.updateOne({ tombamento }, { $set: campos_para_atualizar })
+        if (local !== 'GALPÃO CAPIM MACIO' && local !== 'GALPÃO EMAÚS' && vezes_usado === undefined) {
+            atualizacao.$inc = { vezes_usado: 1 }
+        }
+
+        if (vezes_usado !== undefined) {
+            atualizacao.$set.vezes_usado = vezes_usado
+        }
+
+        const result = await pasta_equipamentos.updateOne({ tombamento }, atualizacao)
 
         if (result.matchedCount === 0) {
             return res.status(404).json({ message: 'Equipamento não encontrado' })
@@ -153,6 +196,20 @@ app.put('/atualizando_equipamentos/:equipamento', autenticacao_token, async (req
     } catch (e) {
         console.log(e)
         res.status(500).json({ message: 'Erro ao atualizar equipamento' })
+    }
+})
+
+app.get('/equipamentos_deletados', autenticacao_token, async (req, res) => {
+    try {
+        const database = client.db('pasta_equipamentos')
+        const pasta_deletados = database.collection(pasta_trabalho_deletados)
+        const equipamentos_deletados = await pasta_deletados.find({}).toArray()
+
+        res.status(200).json(equipamentos_deletados)
+    }
+    catch (e) {
+        console.log(e)
+        res.status(500).json({ message: 'Erro ao encontrar equipamentos deletados' })
     }
 })
 

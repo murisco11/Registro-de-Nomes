@@ -5,10 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <title>Locais</title>
 </head>
 
 <body>
+
+  <nav>
+    <ul>
+      <div id="empresa">DataShow Brasil</div>
+      <div id="hiperlinks">
+        <li><a href="#addLocalSection">Local</a></li>
+        <li><a href="#loginSection">Login</a></li>
+        <li><a href="#userSection">Usuário Logado</a></li>
+      </div>
+    </ul>
+  </nav>
+
   <div class="container">
     <section id="addLocalSection">
       <h2>Locais</h2>
@@ -17,6 +30,8 @@
         <button type="submit">Criar</button>
       </form>
     </section>
+
+    <button type="button" id="btnEquipamentosDeletados">Relatório de Equipamentos deletados</button>
 
     <section id="listaLocaisSection">
       <ul id="listaLocais"></ul>
