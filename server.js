@@ -178,7 +178,7 @@ app.put('/atualizando_equipamentos/:equipamento', autenticacao_token, async (req
             atualizacao.$set.nome_equipamento = nome_equipamento
         }
 
-        if (local !== 'GALPÃO CAPIM MACIO' && local !== 'GALPÃO EMAÚS' && vezes_usado === undefined) {
+        if (local !== 'GALPÃO 1' && local !== 'GALPÃO 2' && vezes_usado === undefined) {
             atualizacao.$inc = { vezes_usado: 1 }
         }
 

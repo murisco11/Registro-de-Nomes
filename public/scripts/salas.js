@@ -43,7 +43,7 @@ document.getElementById('btnEquipamentosDeletados').addEventListener('click', as
 document.getElementById('formLocal').addEventListener('submit', async (event) => {
   event.preventDefault()
   try {
-    const local = document.getElementById('localInput').value
+    const local = document.getElementById('localInput').value.trim()
     if (!local) {
       aplicando_erro(local_input, "Insira o nome do local")
       return
@@ -61,7 +61,7 @@ document.getElementById('formLocal').addEventListener('submit', async (event) =>
       return
     }
     const result = await response.json()
-    aplicando_erro(local_input ,result.message)
+    aplicando_erro(local_input, result.message)
     colocar_eventos()
   }
   catch (error) {
@@ -100,12 +100,12 @@ async function colocar_eventos() {
   }
 }
 
-function aplicando_erro (campo, texto) { 
+function aplicando_erro(campo, texto) {
   const divs_aplicando_erro = document.querySelectorAll('.small-text')
   divs_aplicando_erro.forEach(e => {
-      e.remove()
+    e.remove()
   })
-  const div = document.createElement('div') 
+  const div = document.createElement('div')
   div.innerHTML = texto
   div.classList.add('small-text')
   campo.insertAdjacentElement('afterend', div)

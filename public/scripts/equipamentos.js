@@ -20,8 +20,8 @@ btn_sair_barras.addEventListener('click', () => {
     div_barras.style.display = 'none'
 })
 
-local_input.value = local_selecionado
-h1_local.innerHTML = local_selecionado
+local_input.value = local_selecionado.trim()
+h1_local.innerHTML = local_selecionado.trim()
 let selecionados = new Set()
 let resultado = ''
 let barcode = ''
@@ -86,7 +86,7 @@ document.addEventListener('keydown', async (event) => {
 
         const equipamento = equipamentos.find(equipamento => equipamento.tombamento === resultado)
         if (equipamento) {
-            const checkbox = document.querySelector(`input[data-equipamento="${equipamento.tombamento}"]`)
+            const checkbox = document.getElementById('checkbox-' + equipamento.tombamento)
             if (checkbox) {
                 checkbox.checked = true
                 selecionados.add(equipamento.tombamento)
@@ -94,7 +94,7 @@ document.addEventListener('keydown', async (event) => {
             }
         } else {
             const equipamento_input = document.getElementById('tombamento')
-            equipamento_input.value = resultado
+            equipamento_input.value = resultado.trim()
             div_barras.style.display = 'none'
         }
     } else {
@@ -106,9 +106,9 @@ document.getElementById('nomeForm').addEventListener('submit', async (event) => 
     try {
         event.preventDefault()
         const tombamento_input = document.getElementById('tombamento')
-        const tombamento = document.getElementById('tombamento').value
-        const nome_equipamento = document.getElementById('nome_equipamento').value
-        const local = document.getElementById('local').value
+        const tombamento = document.getElementById('tombamento').value.trim()
+        const nome_equipamento = document.getElementById('nome_equipamento').value.trim()
+        const local = document.getElementById('local').value.trim()
         const usuario_modificou = username
 
         const response = await fetch('/adicionando_equipamentos', {
@@ -170,7 +170,7 @@ async function atualizar_lista_equipamentos() {
             const checkbox = document.createElement('input')
             checkbox.type = 'checkbox'
             checkbox.id = 'checkbox-' + equipamento.tombamento
-            
+
             const label = document.createElement('label')
             label.htmlFor = checkbox.id
 
@@ -182,14 +182,14 @@ async function atualizar_lista_equipamentos() {
                 }
                 atualizar_lista_selecionados()
             })
-            
+
             li.appendChild(checkbox)
             li.appendChild(label)
             equipamentos_list.appendChild(li)
         })
 
         input_search.addEventListener('input', () => {
-            const pesquisa = input_search.value.toLowerCase()
+            const pesquisa = input_search.value.toLowerCase().trim()
             equipamentos_list.innerHTML = ''
 
             equipamentos.forEach(equipamento => {
@@ -207,7 +207,7 @@ async function atualizar_lista_equipamentos() {
                     const checkbox = document.createElement('input')
                     checkbox.type = 'checkbox'
                     checkbox.id = 'checkbox-' + equipamento.tombamento
-                    
+
                     const label = document.createElement('label')
                     label.htmlFor = checkbox.id
 
@@ -219,7 +219,7 @@ async function atualizar_lista_equipamentos() {
                         }
                         atualizar_lista_selecionados()
                     })
-                    
+
                     li.appendChild(checkbox)
                     li.appendChild(label)
                     equipamentos_list.appendChild(li)
@@ -266,9 +266,9 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
             return
         }
 
-        const nome_equipamento = document.getElementById('updateNomeEquipamento').value
-        const local = document.getElementById('selectLocal').value
-        let vezes_usado = document.getElementById('updateVezesUsado').value
+        const nome_equipamento = document.getElementById('updateNomeEquipamento').value.trim()
+        const local = document.getElementById('selectLocal').value.trim()
+        let vezes_usado = document.getElementById('updateVezesUsado').value.trim()
         const usuario_modificou = username
 
         if (!vezes_usado) {
@@ -324,8 +324,8 @@ async function preencher_select_locais() {
 
         locais_filtrados.forEach(local => {
             const option = document.createElement('option')
-            option.innerText = local.local
-            option.value = local.local
+            option.innerText = local.local.trim()
+            option.value = local.local.trim()
             select.appendChild(option)
         })
     } catch (e) {
@@ -333,12 +333,12 @@ async function preencher_select_locais() {
     }
 }
 
-function aplicando_erro (campo, texto) { 
+function aplicando_erro(campo, texto) {
     const divs_aplicando_erro = document.querySelectorAll('.small-text')
     divs_aplicando_erro.forEach(e => {
         e.remove()
     })
-    const div = document.createElement('div') 
+    const div = document.createElement('div')
     div.innerHTML = texto
     div.classList.add('small-text')
     campo.insertAdjacentElement('afterend', div)
