@@ -3,6 +3,13 @@ const username = localStorage.getItem('username')
 if (!token || !username) {
   window.location.href = '../login-register.html'
 }
+
+document.querySelectorAll('.usernameNav').forEach(elemento => {
+  elemento.innerHTML += username
+})
+
+const local_input = document.getElementById('localInput')
+
 console.log(token)
 console.log(username)
 document.getElementById('btnEquipamentosDeletados').addEventListener('click', async () => {
@@ -11,7 +18,6 @@ document.getElementById('btnEquipamentosDeletados').addEventListener('click', as
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (response.status === 401 || response.status === 403) {
-      alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
       window.location.href = '../login-register.html'
       return
     }
@@ -39,7 +45,7 @@ document.getElementById('formLocal').addEventListener('submit', async (event) =>
   try {
     const local = document.getElementById('localInput').value
     if (!local) {
-      alert('ERRO')
+      aplicando_erro(local_input, "Insira o nome do local")
       return
     }
     const response = await fetch('/adicionando_locais', {
@@ -51,12 +57,11 @@ document.getElementById('formLocal').addEventListener('submit', async (event) =>
       body: JSON.stringify({ local })
     })
     if (response.status === 401 || response.status === 403) {
-      alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
       window.location.href = '../login-register.html'
       return
     }
     const result = await response.json()
-    alert(result.message)
+    aplicando_erro(local_input ,result.message)
     colocar_eventos()
   }
   catch (error) {
@@ -72,7 +77,6 @@ async function colocar_eventos() {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (response.status === 401 || response.status === 403) {
-      alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
       window.location.href = '../login-register.html'
       return
     }
@@ -94,6 +98,17 @@ async function colocar_eventos() {
   catch (error) {
     console.error(`Ocorreu um erro em pegar os locais: ${error}`)
   }
+}
+
+function aplicando_erro (campo, texto) { 
+  const divs_aplicando_erro = document.querySelectorAll('.small-text')
+  divs_aplicando_erro.forEach(e => {
+      e.remove()
+  })
+  const div = document.createElement('div') 
+  div.innerHTML = texto
+  div.classList.add('small-text')
+  campo.insertAdjacentElement('afterend', div)
 }
 
 colocar_eventos()

@@ -80,24 +80,24 @@ conexao_mongodb()
 
 app.get('/equipamentos', autenticacao_token, async (req, res) => {
     try {
-        const localSelecionado = req.query.local
+        const local_selecionado = req.query.local
         const database = client.db('pasta_equipamentos')
         const pasta_equipamento = database.collection(pasta_trabalho_equipamentos)
 
         let query = {}
 
-        if (localSelecionado === 'BRASIL') {
-            console.log('Local selecionado:', localSelecionado)
+        if (local_selecionado === 'BRASIL') {
+            console.log('Local selecionado:', local_selecionado)
             query = {}
-        } else if (localSelecionado === 'GALPÕES') {
-            console.log('Local selecionado:', localSelecionado)
-            query.local = { $in: ['GALPÃO CAPIM MACIO', 'GALPÃO EMAÚS'] }
-        } else if (localSelecionado === 'EVENTOS') {
-            console.log('Local selecionado:', localSelecionado)
-            query.local = { $nin: ['GALPÃO CAPIM MACIO', 'GALPÃO EMAÚS'] }
+        } else if (local_selecionado === 'GALPÕES') {
+            console.log('Local selecionado:', local_selecionado)
+            query.local = { $in: ['GALPÃO 1', 'GALPÃO 2'] }
+        } else if (local_selecionado === 'EVENTOS') {
+            console.log('Local selecionado:', local_selecionado)
+            query.local = { $nin: ['GALPÃO 1', 'GALPÃO 2'] }
         } else {
-            console.log('Local selecionado:', localSelecionado)
-            query.local = localSelecionado
+            console.log('Local selecionado:', local_selecionado)
+            query.local = local_selecionado
         }
 
         const equipamentos = await pasta_equipamento.find(query).toArray()

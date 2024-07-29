@@ -1,40 +1,44 @@
 const username = localStorage.getItem('username')
-const localSelecionado = localStorage.getItem('localSelecionado')
+const local_selecionado = localStorage.getItem('localSelecionado')
 const token = localStorage.getItem('token')
-const h1Local = document.getElementById('localH1')
-const localInput = document.getElementById('local')
-const btnSairBarras = document.querySelector('#btnSairBarras')
+const h1_local = document.getElementById('localH1')
+const local_input = document.getElementById('local')
+const btn_sair_barras = document.querySelector('#btnSairBarras')
+const div_barras = document.getElementById('divBarras')
+const lista_selecionados = document.getElementById('listaSelecionados')
+
+
+document.querySelectorAll('.usernameNav').forEach(elemento => {
+    elemento.innerHTML += username
+})
 
 if (!token || !username) {
     window.location.href = '../login-register.html'
 }
 
-btnSairBarras.addEventListener('click', () => {
-    const divBarras = document.getElementById('divBarras')
-    divBarras.style.display = 'none'
+btn_sair_barras.addEventListener('click', () => {
+    div_barras.style.display = 'none'
 })
 
-localInput.value = localSelecionado
-h1Local.innerHTML = localSelecionado
+local_input.value = local_selecionado
+h1_local.innerHTML = local_selecionado
 let selecionados = new Set()
 let resultado = ''
 let barcode = ''
 let reading = false
 
 document.getElementById('leitorBarras').addEventListener('click', () => {
-    const divBarras = document.getElementById('divBarras')
-    divBarras.style.display = 'block'
+    div_barras.style.display = 'block'
     reading = true
     barcode = ''
 })
 
 document.querySelector('#btnBaixarRelatorio').addEventListener('click', async () => {
     try {
-        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`, {
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(local_selecionado)}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.status === 401 || response.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
@@ -69,14 +73,12 @@ document.addEventListener('keydown', async (event) => {
         barcode = ''
         reading = false
 
-        const divBarras = document.getElementById('divBarras')
-        divBarras.style.display = 'none'
+        div_barras.style.display = 'none'
 
-        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`, {
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(local_selecionado)}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.status === 401 || response.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
@@ -91,9 +93,9 @@ document.addEventListener('keydown', async (event) => {
                 atualizar_lista_selecionados()
             }
         } else {
-            const equipamentoInput = document.getElementById('tombamento')
-            equipamentoInput.value = resultado
-            divBarras.style.display = 'none'
+            const equipamento_input = document.getElementById('tombamento')
+            equipamento_input.value = resultado
+            div_barras.style.display = 'none'
         }
     } else {
         barcode += event.key
@@ -103,6 +105,7 @@ document.addEventListener('keydown', async (event) => {
 document.getElementById('nomeForm').addEventListener('submit', async (event) => {
     try {
         event.preventDefault()
+        const tombamento_input = document.getElementById('tombamento')
         const tombamento = document.getElementById('tombamento').value
         const nome_equipamento = document.getElementById('nome_equipamento').value
         const local = document.getElementById('local').value
@@ -117,13 +120,12 @@ document.getElementById('nomeForm').addEventListener('submit', async (event) => 
             body: JSON.stringify({ tombamento, nome_equipamento, local, usuario_modificou }),
         })
         if (response.status === 401 || response.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
 
         const result = await response.json()
-        alert(result.message)
+        aplicando_erro(tombamento_input, result.message)
         atualizar_lista_equipamentos()
     } catch (e) {
         alert('Erro ao adicionar equipamento')
@@ -132,42 +134,46 @@ document.getElementById('nomeForm').addEventListener('submit', async (event) => 
 
 async function atualizar_lista_equipamentos() {
     try {
-        const response = await fetch(`/equipamentos?local=${encodeURIComponent(localSelecionado)}`, {
+        const response = await fetch(`/equipamentos?local=${encodeURIComponent(local_selecionado)}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.status === 401 || response.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
         const equipamentos = await response.json()
 
-        const equipamentosList = document.getElementById('equipamentosList')
-        const inputSearch = document.getElementById('inputSearch')
-        const listaSelecionados = document.getElementById('listaSelecionados')
+        const equipamentos_list = document.getElementById('equipamentosList')
+        const input_search = document.getElementById('inputSearch')
 
-        equipamentosList.innerHTML = ''
-        listaSelecionados.innerHTML = ''
+        equipamentos_list.innerHTML = ''
+        lista_selecionados.innerHTML = ''
 
         equipamentos.forEach(equipamento => {
             const li = document.createElement('li')
             li.textContent = `${equipamento.nome_equipamento} (${equipamento.tombamento}) - ${equipamento.local} -  Data de criação do produto: ${equipamento.data_criacao} - Quantas vezes usado: ${equipamento.vezes_usado}`
 
-            const btnExcluir = document.createElement('button')
-            btnExcluir.textContent = 'Excluir'
-            btnExcluir.addEventListener('click', () => {
+            const btn_excluir = document.createElement('button')
+            btn_excluir.textContent = 'Excluir'
+            btn_excluir.addEventListener('click', () => {
                 const motivo = prompt(`Insira o motivo do porque deletar o ${equipamento.nome_equipamento} (${equipamento.tombamento})`)
                 if (!motivo) {
-                    alert("Equipamento não deletado!")
+                    aplicando_erro(li, "Equipamento não deletado!")
                     return
                 }
                 deletar_equipamentos(equipamento.tombamento, motivo)
             })
-            li.appendChild(btnExcluir)
+            btn_excluir.classList.add('button')
+            btn_excluir.style.margin = '0 10px'
+            li.appendChild(btn_excluir)
 
             const checkbox = document.createElement('input')
             checkbox.type = 'checkbox'
-            checkbox.setAttribute('data-nome', equipamento.tombamento)
+            checkbox.id = 'checkbox-' + equipamento.tombamento
+            
+            const label = document.createElement('label')
+            label.htmlFor = checkbox.id
+
             checkbox.addEventListener('change', () => {
                 if (checkbox.checked) {
                     selecionados.add(equipamento.tombamento)
@@ -176,28 +182,35 @@ async function atualizar_lista_equipamentos() {
                 }
                 atualizar_lista_selecionados()
             })
-
+            
             li.appendChild(checkbox)
-            equipamentosList.appendChild(li)
+            li.appendChild(label)
+            equipamentos_list.appendChild(li)
         })
 
-        inputSearch.addEventListener('input', () => {
-            const searchTerm = inputSearch.value.toLowerCase()
-            equipamentosList.innerHTML = ''
+        input_search.addEventListener('input', () => {
+            const pesquisa = input_search.value.toLowerCase()
+            equipamentos_list.innerHTML = ''
 
             equipamentos.forEach(equipamento => {
-                const equipamentoLowerCase = equipamento.tombamento.toLowerCase()
-                if (equipamentoLowerCase.includes(searchTerm)) {
+                const equipamento_lower_case = equipamento.tombamento.toLowerCase()
+                if (equipamento_lower_case.includes(pesquisa)) {
                     const li = document.createElement('li')
                     li.textContent = `${equipamento.nome_equipamento} (${equipamento.tombamento}) - ${equipamento.local} -  Data de criação do produto: ${equipamento.data_criacao} - Quantas vezes usado: ${equipamento.vezes_usado}`
 
-                    const btnExcluir = document.createElement('button')
-                    btnExcluir.textContent = 'Excluir'
-                    btnExcluir.addEventListener('click', () => deletar_equipamentos(equipamento.tombamento))
-                    li.appendChild(btnExcluir)
+                    const btn_excluir = document.createElement('button')
+                    btn_excluir.textContent = 'Excluir'
+                    btn_excluir.addEventListener('click', () => deletar_equipamentos(equipamento.tombamento))
+                    btn_excluir.classList.add('button')
+                    li.appendChild(btn_excluir)
 
                     const checkbox = document.createElement('input')
                     checkbox.type = 'checkbox'
+                    checkbox.id = 'checkbox-' + equipamento.tombamento
+                    
+                    const label = document.createElement('label')
+                    label.htmlFor = checkbox.id
+
                     checkbox.addEventListener('change', () => {
                         if (checkbox.checked) {
                             selecionados.add(equipamento.tombamento)
@@ -206,9 +219,10 @@ async function atualizar_lista_equipamentos() {
                         }
                         atualizar_lista_selecionados()
                     })
-
+                    
                     li.appendChild(checkbox)
-                    equipamentosList.appendChild(li)
+                    li.appendChild(label)
+                    equipamentos_list.appendChild(li)
                 }
             })
         })
@@ -218,13 +232,12 @@ async function atualizar_lista_equipamentos() {
 }
 
 function atualizar_lista_selecionados() {
-    const listaSelecionados = document.getElementById('listaSelecionados')
-    listaSelecionados.innerHTML = ''
+    lista_selecionados.innerHTML = ''
 
     selecionados.forEach(equipamento => {
         const li = document.createElement('li')
         li.textContent = equipamento
-        listaSelecionados.appendChild(li)
+        lista_selecionados.appendChild(li)
     })
 }
 
@@ -235,12 +248,10 @@ async function deletar_equipamentos(equipamento, motivo) {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.status === 401 || response.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
         atualizar_lista_equipamentos()
-        alert(`${equipamento} excluído com sucesso!`)
     } catch (e) {
         alert('Erro ao excluir equipamento')
     }
@@ -248,9 +259,11 @@ async function deletar_equipamentos(equipamento, motivo) {
 
 document.getElementById('updateForm').addEventListener('submit', async (event) => {
     event.preventDefault()
+    const atualizar_equipamento_deletado = document.querySelector('#atualizarEquipamentoBtn')
     try {
         if (selecionados.size === 0) {
-            return alert('Não possui nenhum equipamento selecionado!')
+            aplicando_erro(atualizarEquipamentoBtn, "Não há nenhum equipamento selecionado!")
+            return
         }
 
         const nome_equipamento = document.getElementById('updateNomeEquipamento').value
@@ -278,12 +291,11 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
             await response.json()
         })
         if (responses.status === 401 || responses.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
 
-        alert('Nomes atualizados com sucesso!')
+        aplicando_erro(atualizarEquipamentoBtn, "Equipamentos atualizados com sucesso!")
         selecionados.clear()
         atualizar_lista_equipamentos()
     } catch (e) {
@@ -291,13 +303,12 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
     }
 })
 
-async function preencherSelectLocais() {
+async function preencher_select_locais() {
     try {
         const response = await fetch('/locais', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.status === 401 || response.status === 403) {
-            alert('Sessão expirada ou não autorizada. Redirecionando para o login...')
             window.location.href = '../login-register.html'
             return
         }
@@ -322,5 +333,16 @@ async function preencherSelectLocais() {
     }
 }
 
-preencherSelectLocais()
+function aplicando_erro (campo, texto) { 
+    const divs_aplicando_erro = document.querySelectorAll('.small-text')
+    divs_aplicando_erro.forEach(e => {
+        e.remove()
+    })
+    const div = document.createElement('div') 
+    div.innerHTML = texto
+    div.classList.add('small-text')
+    campo.insertAdjacentElement('afterend', div)
+}
+
+preencher_select_locais()
 atualizar_lista_equipamentos()

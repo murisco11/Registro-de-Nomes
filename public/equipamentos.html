@@ -5,62 +5,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerenciamento de Equipamentos</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
-    <div class="container">
 
-        <nav>
-            <ul>
-                <div id="empresa">DataShow Brasil</div>
-                <li><a href="#addLocalSection">Local</a></li>
-                <li><a href="#loginSection">Login</a></li>
-                <li><a href="#userSection">Usuário Logado</a></li>
+    <header id="header">
+        <nav id="navbar">
+            <h1 id="nav_logo">
+                <img src="assets/images/teste.png" alt="logo" />
+            </h1>
+            <div class="menu-toggle">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul id="nav_list" class="nav-list">
+                <li class="nav-item active">
+                    <a href="#">Equipamentos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html">Locais</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login-register.html" class="usernameNav">Usuário: </a>
+                </li>
             </ul>
+
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
         </nav>
+
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item active">
+                    <a href="#">Equipamentos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html">Locais</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login-register.html" class="usernameNav">Usuário: </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
 
         <h1 id="localH1"></h1>
 
-        <button id="btnBaixarRelatorio">Baixar Relatório</button>
+        <button id="btnBaixarRelatorio" class="button">Baixar Relatório</button>
 
-        <section id="addNomeSection">
-            <h2>Adicionar Equipamento</h2>
-            <button id="leitorBarras" type="button">Ler código de barras</button>
-            <div id="divBarras" class="container">
-                <h1>Esperando ler os códigos de barras</h1>
-                <button id="btnSairBarras">Sair da sessão de leitura de código de barras</button>
+        <section id="addNomeSection" class="section">
+            <h2 class="section-title">Adicionar Equipamento</h2>
+            <button id="leitorBarras" type="button" class="button">Ler código de barras</button>
+            <div id="divBarras" class="barras-container">
+                <h1 class="barras-title">Esperando ler os códigos de barras</h1>
+                <button id="btnSairBarras" class="button">Sair da sessão de leitura de código de barras</button>
             </div>
-            <form id="nomeForm">
-                <input type="text" id="tombamento" placeholder="Tombamento" required>
-                <input type="text" id="nome_equipamento" placeholder="Nome do Equipamento" required>
-                <input type="text" id="local" placeholder="Local" required disabled>
-                <button type="submit">Adicionar Equipamento</button>
+            <form id="nomeForm" class="form">
+                <input type="text" id="tombamento" placeholder="Tombamento" class="input" required>
+                <input type="text" id="nome_equipamento" placeholder="Nome do Equipamento" class="input" required>
+                <input type="text" id="local" placeholder="Local" class="input" required disabled>
+                <button type="submit" class="button">Adicionar Equipamento</button>
             </form>
         </section>
 
-        <section id="updateNomeSection">
-            <h2>Atualizar Equipamento</h2>
-            <form id="updateForm">
+        <section id="updateNomeSection" class="section">
+            <h2 class="section-title">Atualizar Equipamento</h2>
+            <form id="updateForm" class="form">
                 <input type="hidden" id="updateTombamento">
-                <input type="text" id="updateNomeEquipamento" placeholder="Novo Nome do Equipamento">
-                <input type="text" id="updateVezesUsado" placeholder="Novo Numero de Vezes Usado">
-                <select id="selectLocal"></select>
-                <button type="submit">Atualizar Equipamento</button>
+                <input type="text" id="updateNomeEquipamento" placeholder="Novo Nome do Equipamento" class="input">
+                <input type="text" id="updateVezesUsado" placeholder="Novo Numero de Vezes Usado" class="input">
+                <select id="selectLocal" class="input"></select>
+                <button type="submit" id="atualizarEquipamentoBtn" class="button">Atualizar Equipamento</button>
             </form>
         </section>
 
-        <section id="listasSection">
-            <h2>Lista Selecionados</h2>
-            <ul id="listaSelecionados"></ul>
+        <section id="listasSection" class="section">
+            <h2 class="section-title">Lista Selecionados</h2>
+            <ul id="listaSelecionados" class="list"></ul>
 
-            <input type="text" id="inputSearch" placeholder="Digite para buscar...">
-            <h2>Lista Geral</h2>
-            <ul id="equipamentosList"></ul>
+            <input type="text" id="inputSearch" placeholder="Digite para buscar..." class="input">
+            <h2 class="section-title">Lista Geral</h2>
+            <ul id="equipamentosList" class="list"></ul>
         </section>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileBtn = document.getElementById('mobile_btn')
+            const mobileMenu = document.getElementById('mobile_menu')
+
+            if (mobileBtn && mobileMenu) {
+                mobileBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active')
+                })
+            }
+        })
+    </script>
     <script src="scripts/equipamentos.js"></script>
 </body>
 

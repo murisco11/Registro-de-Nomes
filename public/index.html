@@ -1,44 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="assets/css/style.css">
-  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <title>Locais</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Equipamentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
 
 <body>
+    <header id="header" class="header">
+        <nav id="navbar" class="navbar">
+            <h1 id="nav_logo" class="nav-logo">
+                <img src="assets/images/teste.png" alt="logo" />
+            </h1>
+            <div class="menu-toggle">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul id="nav_list" class="nav-list">
+                <li class="nav-item">
+                    <a href="#">Equipamentos</a>
+                </li>
+                <li class="nav-item active">
+                    <a href="index.html">Locais</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login-register.html" class="usernameNav">Usuário: </a>
+                </li>
+            </ul>
+            <button id="mobile_btn" class="mobile-btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
 
-  <nav>
-    <ul>
-      <div id="empresa">DataShow Brasil</div>
-      <div id="hiperlinks">
-        <li><a href="#addLocalSection">Local</a></li>
-        <li><a href="#loginSection">Login</a></li>
-        <li><a href="#userSection">Usuário Logado</a></li>
-      </div>
-    </ul>
-  </nav>
+        <div id="mobile_menu" class="mobile-menu">
+            <ul id="mobile_nav_list" class="mobile-nav-list">
+                <li class="nav-item active">
+                    <a href="#">Equipamentos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html">Locais</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login-register.html" class="usernameNav">Usuário: </a>
+                </li>
+            </ul>
+        </div>
+    </header>
 
-  <div class="container">
-    <section id="addLocalSection">
-      <h2>Locais</h2>
-      <form id="formLocal">
-        <input type="text" id="localInput" placeholder="Adicione o local colocando o nome">
-        <button type="submit">Criar</button>
-      </form>
-    </section>
+    <div class="container">
+        <section id="addLocalSection" class="section">
+            <h2 class="section-title">Locais</h2>
+            <form id="formLocal" class="form">
+                <input type="text" id="localInput" class="input" placeholder="Adicione o local colocando o nome dele">
+                <button type="submit" class="button">Criar</button>
+            </form>
+        </section>
 
-    <button type="button" id="btnEquipamentosDeletados">Relatório de Equipamentos deletados</button>
+        <button type="button" id="btnEquipamentosDeletados" class="button">Relatório de Equipamentos deletados</button>
 
-    <section id="listaLocaisSection">
-      <ul id="listaLocais"></ul>
-    </section>
-  </div>
+        <section id="listaLocaisSection" class="section">
+            <ul id="listaLocais" class="list"></ul>
+        </section>
+    </div>
 
-  <script src="./scripts/salas.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileBtn = document.getElementById('mobile_btn')
+            const mobileMenu = document.getElementById('mobile_menu')
+
+            if (mobileBtn && mobileMenu) {
+                mobileBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('active')
+                })
+            }
+        })
+    </script>
+    <script src="./scripts/salas.js"></script>
 </body>
 
 </html>
