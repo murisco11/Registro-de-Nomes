@@ -1,3 +1,4 @@
+
 # Sistema de gerenciamento de equipamentos
 
 Desenvolvi esse sistema para a empresa do qual trabalho para gerenciar os equipamentos: saber onde eles estão, editá-los conforme o necessário, deletar e etc. Além disso, tem funções de baixar relatórios, um sistema muito completo
@@ -8,7 +9,6 @@ Desenvolvi esse sistema para a empresa do qual trabalho para gerenciar os equipa
 - [Stacks](#tecnologiasbibliotecasframeworks-utilizados)
 - [Como testar?](#como-usar)
 - [Contato](#autores)
-
 
 ## Funcionalidades
 

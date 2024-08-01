@@ -1,20 +1,18 @@
-const token = localStorage.getItem('token')
-const username = localStorage.getItem('username')
-if (!token || !username) {
-  window.location.href = '../login-register.html'
+const token = localStorage.getItem('token') // Acessando o token
+const username = localStorage.getItem('username') // Acessando o usuário
+if (!token || !username) { // Se qualquer um dos dois for inválido...
+  window.location.href = '../login-register.html' // Direciona para área de registro
 }
 
-document.querySelectorAll('.usernameNav').forEach(elemento => {
+document.querySelectorAll('.usernameNav').forEach(elemento => { // Adicionado a string do usuário em elementos HTML
   elemento.innerHTML += username
 })
 
 const local_input = document.getElementById('localInput')
 
-console.log(token)
-console.log(username)
-document.getElementById('btnEquipamentosDeletados').addEventListener('click', async () => {
+document.getElementById('btnEquipamentosDeletados').addEventListener('click', async () => { // Função para puxar os equipamentos deletados
   try {
-    const response = await fetch('/equipamentos_deletados', {
+    const response = await fetch('/equipamentos_deletados', { // Início da requisição
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (response.status === 401 || response.status === 403) {
@@ -22,46 +20,46 @@ document.getElementById('btnEquipamentosDeletados').addEventListener('click', as
       return
     }
 
-    const equipamentos_deletados = await response.json()
-    const data = equipamentos_deletados.map(equipamento => ({
+    const equipamentos_deletados = await response.json() // Pegando um array com os equipamentos deletados
+    const data = equipamentos_deletados.map(equipamento => ({ // Criando dados para ser usado no SheetJS
       Tombamento: equipamento.tombamento,
       Equipamento: equipamento.equipamento,
       "Usuário que deletou": equipamento.usuario,
       Motivo: equipamento.motivo
     }))
 
-    const planilha = XLSX.utils.json_to_sheet(data)
-    const pasta_trabalho = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(pasta_trabalho, planilha, 'Relatorio')
+    const planilha = XLSX.utils.json_to_sheet(data) // Cria a planilha com os dados
+    const pasta_trabalho = XLSX.utils.book_new() // Cria a pasta de trabalho
+    XLSX.utils.book_append_sheet(pasta_trabalho, planilha, 'Relatorio') // Junta tudo e coloca nome
 
-    XLSX.writeFile(pasta_trabalho, 'relatorio.xlsx')
+    XLSX.writeFile(pasta_trabalho, 'relatorio.xlsx') // Adicionando a planila na pasta de trabalho com o nome
   } catch (error) {
     console.error('Erro ao gerar relatório:', error)
   }
 })
 
-document.getElementById('formLocal').addEventListener('submit', async (event) => {
-  event.preventDefault()
+document.getElementById('formLocal').addEventListener('submit', async (event) => { // Form para adicionar local
+  event.preventDefault() // Previne restart do formulário
   try {
-    const local = document.getElementById('localInput').value.trim()
-    if (!local) {
-      aplicando_erro(local_input, "Insira o nome do local")
+    const local = document.getElementById('localInput').value.trim() // Coletando o nome do local
+    if (!local) { // Se a área estiver sem nada...
+      aplicando_mensagem(local_input, "Insira o nome do local")
       return
     }
-    const response = await fetch('/adicionando_locais', {
+    const response = await fetch('/adicionando_locais', { // Início da requisição
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ local })
+      body: JSON.stringify({ local }) // Mandando o local para o servidor
     })
     if (response.status === 401 || response.status === 403) {
       window.location.href = '../login-register.html'
       return
     }
     const result = await response.json()
-    aplicando_erro(local_input, result.message)
+    aplicando_mensagem(local_input, result.message)
     colocar_eventos()
   }
   catch (error) {
@@ -69,19 +67,19 @@ document.getElementById('formLocal').addEventListener('submit', async (event) =>
   }
 })
 
-async function colocar_eventos() {
-  const lista = document.getElementById('listaLocais')
-  lista.innerHTML = ''
+async function colocar_eventos() { // Function para adicionar na listade locais
+  const lista = document.getElementById('listaLocais') // Coletando a lista de lociais
+  lista.innerHTML = '' // Limpa a lista de locais
   try {
-    const response = await fetch('/locais', {
+    const response = await fetch('/locais', { // Início da requisição
       headers: { 'Authorization': `Bearer ${token}` }
     })
     if (response.status === 401 || response.status === 403) {
       window.location.href = '../login-register.html'
       return
     }
-    const locais = await response.json()
-    locais.forEach(local => {
+    const locais = await response.json() // Coletando os locais
+    locais.forEach(local => { // Para cada local... (cria li, cria hiperlink, adiciona no local storage e etc.)
       const li = document.createElement('li')
       const a = document.createElement('a')
       a.setAttribute('href', '../equipamentos.html')
@@ -100,9 +98,9 @@ async function colocar_eventos() {
   }
 }
 
-function aplicando_erro(campo, texto) {
-  const divs_aplicando_erro = document.querySelectorAll('.small-text')
-  divs_aplicando_erro.forEach(e => {
+function aplicando_mensagem(campo, texto) { // Função para aplicar texto nas divs
+  const divs_aplicando_mensagem = document.querySelectorAll('.small-text')
+  divs_aplicando_mensagem.forEach(e => {
     e.remove()
   })
   const div = document.createElement('div')

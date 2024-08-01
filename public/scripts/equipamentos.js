@@ -279,27 +279,35 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
             vezes_usado = undefined
         }
 
-        const promises = Array.from(selecionados).map(equipamento => { // Para cada equipamento, eu atualizo todos
+        // Para cada equipamento selecionado, crie uma promessa para atualizar o equipamento
+        const promises = Array.from(selecionados).map(equipamento => { // Precisa transformar em array pois vai usar o Promise.all
+            // Retorna uma promessa de fetch para atualizar o equipamento
             return fetch(`/atualizando_equipamentos/${equipamento}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json', // Define o tipo de conteúdo como JSON
+                    'Authorization': `Bearer ${token}` // Inclui o token de autorização no cabeçalho
                 },
-                body: JSON.stringify({ nome_equipamento, local, usuario_modificou, vezes_usado }),
+                body: JSON.stringify({ nome_equipamento, local, usuario_modificou, vezes_usado }), // Define o corpo da requisição como uma string JSON com os dados do equipamento
             })
         })
 
+        // Aguarda todas as promessas de fetch serem concluídas
         const responses = await Promise.all(promises)
+
+        // Para cada resposta, converte a resposta em JSON
         responses.forEach(async response => {
             await response.json()
         })
+
+        // Verifica se alguma das respostas tem status 401 (não autorizado) ou 403 (proibido)
         if (responses.status === 401 || responses.status === 403) {
+            // Redireciona para a página de login se o usuário não estiver autorizado
             window.location.href = '../login-register.html'
             return
         }
 
-        aplicando_mensagem(atualizarEquipamentoBtn, "Equipamentos atualizados com sucesso!")
+        aplicando_mensagem(atualizarEquipamentoBtn, "Equipamentos atualizados com sucesso!") // Atualizando todos os equipamentos
         selecionados.clear()
         atualizar_lista_equipamentos()
     } catch (e) {
@@ -307,7 +315,7 @@ document.getElementById('updateForm').addEventListener('submit', async (event) =
     }
 })
 
-async function preencher_select_locais() {
+async function preencher_select_locais() { // Atualiza os locais que podem ser selecionados
     try {
         const response = await fetch('/locais', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -316,9 +324,9 @@ async function preencher_select_locais() {
             window.location.href = '../login-register.html'
             return
         }
-        const locais = await response.json()
+        const locais = await response.json() // Pegando todos os locais
 
-        const locais_filtrados = locais.filter(local =>
+        const locais_filtrados = locais.filter(local => // Tira os locais que não podem selecionar através do filter
             local.local !== 'GALPÕES' &&
             local.local !== 'EVENTOS' &&
             local.local !== 'BRASIL'
@@ -326,7 +334,7 @@ async function preencher_select_locais() {
 
         const select = document.getElementById('selectLocal')
 
-        locais_filtrados.forEach(local => {
+        locais_filtrados.forEach(local => { // Para cada local, cria uma option
             const option = document.createElement('option')
             option.innerText = local.local.trim()
             option.value = local.local.trim()
@@ -337,7 +345,7 @@ async function preencher_select_locais() {
     }
 }
 
-function aplicando_mensagem(campo, texto) {
+function aplicando_mensagem(campo, texto) { // Function para aplicar mensagem, tanto de erro tanto de confirmação
     const divs_aplicando_mensagem = document.querySelectorAll('.small-text')
     divs_aplicando_mensagem.forEach(e => {
         e.remove()
